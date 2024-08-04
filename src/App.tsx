@@ -1,10 +1,25 @@
+import AddTodo from "./AddTodo";
 import { Counter } from "./redux/features/counter/Counter";
 import { useGetPokemonByNameQuery } from "./redux/services/pokemon";
-import { CounterZustand } from "./zustand/Counter";
+import { useTodosStore } from "./zustand/todos";
+import { shallow } from "zustand/shallow";
 
 function App() {
   const { data, error, isLoading } = useGetPokemonByNameQuery("bulbasaur");
-  console.log(data);
+
+  // zustand
+
+  const { removeTodo, todos } = useTodosStore(
+    (state) => ({
+      todos: state.todos,
+      removeTodo: state.removeTodo,
+      // fetchTodos: state.fetchTodos,
+    }),
+    shallow
+  );
+  // fetchTodos();
+
+  console.log("todos" + todos);
 
   return (
     <div className="flex h-screen justify-center items-center bg-gray-300">
@@ -23,8 +38,18 @@ function App() {
           </div>
         ) : null}
       </div>
-      <div className="flex flex-1 justify-center items-center">
-        <CounterZustand />
+      <div className="flex flex-1 justify-center items-center flex-col gap-4">
+        {todos.length === 0 && <div>Hic todo eklememeissin</div>}
+        {todos.map((todo, key) => (
+          <div>
+            {todo.title} <br />
+            {todo.completed ? "Tamamlandi" : "Bekliyor"}
+            <br />
+            <button onClick={() => removeTodo(key)}>Sil</button>
+          </div>
+        ))}
+
+        <AddTodo />
       </div>
     </div>
   );
